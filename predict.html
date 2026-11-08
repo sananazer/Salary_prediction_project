@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalaryPredict | Salary Estimator</title>
+
+    <!-- Graph library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1120;
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 1px solid #263247;
+            background: #101a2e;
+        }
+
+        .logo {
+            color: #60a5fa;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            color: #60a5fa;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1050px;
+            margin: 40px auto;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .heading h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .heading h1 span {
+            color: #60a5fa;
+        }
+
+        .heading p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .card {
+            background: #121e33;
+            border: 1px solid #263750;
+            border-radius: 16px;
+            padding: 26px;
+            min-width: 0;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 21px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: #dbeafe;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #344761;
+            background: #0b1527;
+            color: #f1f5f9;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #60a5fa;
+        }
+
+        select option {
+            background: #121e33;
+            color: #f1f5f9;
+        }
+
+        optgroup {
+            background: #121e33;
+            color: #60a5fa;
+        }
+
+        .predict-button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 14px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .predict-button:hover {
+            background: #2563eb;
+        }
+
+        .result-card {
+            min-height: 280px;
+        }
+
+        .result-icon {
+            font-size: 35px;
+            margin-bottom: 15px;
+        }
+
+        .muted {
+            color: #94a3b8;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .salary-amount {
+            color: #60a5fa;
+            font-size: 25px;
+            font-weight: bold;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .result-line {
+            padding: 12px 0;
+            border-bottom: 1px solid #263750;
+            line-height: 1.6;
+        }
+
+        .graph-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-top: 15px;
+        }
+
+        .graph-title {
+            color: #dbeafe;
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .notice {
+            margin-top: 18px;
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        footer {
+            padding: 25px;
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 750px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+            .heading h1 {
+                font-size: 27px;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+
+            .container {
+                margin-top: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SalaryPredict</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="predict.html">Predict Salary</a>
+        <a href="insights.html">Insights</a>
+        <a href="about.html">About</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <div class="heading">
+        <h1>Salary <span>Prediction</span></h1>
+        <p>Estimate your annual and monthly salary based on your career profile.</p>
+    </div>
+
+    <div class="layout">
+
+        <section class="card">
+            <h2>Enter Your Details</h2>
+
+            <form id="salary-form">
+
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="role">Job Role</label>
+
+                        <select id="role" name="role" required>
+                            <option value="">Select Job Role</option>
+
+                            <optgroup label="Software & IT Jobs">
+                                <option>Software Developer</option>
+                                <option>Software Engineer</option>
+                                <option>Senior Software Engineer</option>
+                                <option>Full Stack Developer</option>
+                                <option>Frontend Developer</option>
+                                <option>Backend Developer</option>
+                                <option>Web Developer</option>
+                                <option>Mobile App Developer</option>
+                                <option>Android Developer</option>
+                                <option>iOS Developer</option>
+                                <option>Python Developer</option>
+                                <option>Java Developer</option>
+                                <option>JavaScript Developer</option>
+                                <option>C++ Developer</option>
+                                <option>PHP Developer</option>
+                                <option>Game Developer</option>
+                                <option>DevOps Engineer</option>
+                                <option>Cloud Engineer</option>
+                                <option>Cloud Architect</option>
+                                <option>Cybersecurity Analyst</option>
+                                <option>Cybersecurity Engineer</option>
+                                <option>Network Engineer</option>
+                                <option>System Administrator</option>
+                                <option>IT Support Specialist</option>
+                                <option>IT Manager</option>
+                                <option>QA Engineer</option>
+                                <option>Software Tester</option>
+                                <option>Automation Tester</option>
+                                <option>Database Administrator</option>
+                                <option>System Architect</option>
+                                <option>Technical Support Engineer</option>
+                            </optgroup>
+
+                            <optgroup label="Data, AI & Analytics">
+                                <option>Data Analyst</option>
+                                <option>Data Scientist</option>
+                                <option>Data Engineer</option>
+                                <option>Big Data Engineer</option>
+                                <option>Machine Learning Engineer</option>
+                                <option>AI Engineer</option>
+                                <option>AI Researcher</option>
+                                <option>Business Intelligence Analyst</option>
+                                <option>Business Analyst</option>
+                                <option>Data Architect</option>
+                                <option>Statistician</option>
+                                <option>Research Analyst</option>
+                                <option>Data Quality Analyst</option>
+                                <option>Database Developer</option>
+                            </optgroup>
+
+                            <optgroup label="Design & Product">
+                                <option>UI/UX Designer</option>
+                                <option>UI Designer</option>
+                                <option>UX Designer</option>
+                                <option>Graphic Designer</option>
+                                <option>Product Designer</option>
+                                <option>Product Manager</option>
+                                <option>Project Manager</option>
+                                <option>Scrum Master</option>
+                                <option>Business Consultant</option>
+                                <option>Technical Writer</option>
+                                <option>Content Writer</option>
+                            </optgroup>
+
+                            <optgroup label="Engineering">
+                                <option>Civil Engineer</option>
+                                <option>Mechanical Engineer</option>
+                                <option>Electrical Engineer</option>
+                                <option>Electronics Engineer</option>
+                                <option>Computer Engineer</option>
+                                <option>Chemical Engineer</option>
+                                <option>Automobile Engineer</option>
+                                <option>Biomedical Engineer</option>
+                                <option>Aerospace Engineer</option>
+                                <option>Robotics Engineer</option>
+                                <option>Embedded Systems Engineer</option>
+                                <option>Production Engineer</option>
+                                <option>Quality Engineer</option>
+                                <option>Environmental Engineer</option>
+                            </optgroup>
+
+                            <optgroup label="School Teaching Jobs">
+                                <option>Nursery Teacher</option>
+                                <option>Kindergarten Teacher</option>
+                                <option>Pre-Primary Teacher</option>
+                                <option>Primary School Teacher</option>
+                                <option>Upper Primary Teacher</option>
+                                <option>Assistant Teacher</option>
+                                <option>School Teacher</option>
+                                <option>High School Teacher</option>
+                                <option>Higher Secondary Teacher</option>
+                                <option>TGT Teacher</option>
+                                <option>PGT Teacher</option>
+                                <option>Mathematics Teacher</option>
+                                <option>Science Teacher</option>
+                                <option>Physics Teacher</option>
+                                <option>Chemistry Teacher</option>
+                                <option>Biology Teacher</option>
+                                <option>Computer Science Teacher</option>
+                                <option>English Teacher</option>
+                                <option>Malayalam Teacher</option>
+                                <option>Hindi Teacher</option>
+                                <option>Social Science Teacher</option>
+                                <option>Economics Teacher</option>
+                                <option>Commerce Teacher</option>
+                                <option>Physical Education Teacher</option>
+                                <option>Art Teacher</option>
+                                <option>Music Teacher</option>
+                                <option>Special Education Teacher</option>
+                                <option>Vocational Teacher</option>
+                                <option>Head Teacher</option>
+                                <option>School Coordinator</option>
+                                <option>Vice Principal</option>
+                                <option>School Principal</option>
+                            </optgroup>
+
+                            <optgroup label="College & University Teaching">
+                                <option>Teaching Assistant</option>
+                                <option>Academic Instructor</option>
+                                <option>College Lecturer</option>
+                                <option>Lecturer</option>
+                                <option>Guest Lecturer</option>
+                                <option>Guest Faculty</option>
+                                <option>Visiting Faculty</option>
+                                <option>Assistant Professor</option>
+                                <option>Associate Professor</option>
+                                <option>Professor</option>
+                                <option>Senior Professor</option>
+                                <option>University Lecturer</option>
+                                <option>University Assistant Professor</option>
+                                <option>University Associate Professor</option>
+                                <option>University Professor</option>
+                                <option>Adjunct Professor</option>
+                                <option>Research Professor</option>
+                                <option>Teaching Fellow</option>
+                                <option>Research Fellow</option>
+                                <option>Postdoctoral Researcher</option>
+                                <option>Head of Department</option>
+                                <option>Academic Coordinator</option>
+                                <option>College Principal</option>
+                                <option>Dean</option>
+                                <option>University Registrar</option>
+                                <option>Laboratory Instructor</option>
+                            </optgroup>
+
+                            <optgroup label="Other Teaching & Training">
+                                <option>Private Tutor</option>
+                                <option>Home Tutor</option>
+                                <option>Online Teacher</option>
+                                <option>Coaching Centre Teacher</option>
+                                <option>IELTS Trainer</option>
+                                <option>Language Trainer</option>
+                                <option>Corporate Trainer</option>
+                                <option>Technical Trainer</option>
+                                <option>Computer Instructor</option>
+                                <option>Soft Skills Trainer</option>
+                                <option>Educational Consultant</option>
+                                <option>Curriculum Developer</option>
+                                <option>Instructional Designer</option>
+                                <option>Education Counsellor</option>
+                            </optgroup>
+
+                            <optgroup label="Business & Finance">
+                                <option>HR Manager</option>
+                                <option>HR Executive</option>
+                                <option>Recruiter</option>
+                                <option>Marketing Specialist</option>
+                                <option>Marketing Manager</option>
+                                <option>Digital Marketing Specialist</option>
+                                <option>SEO Specialist</option>
+                                <option>Sales Executive</option>
+                                <option>Sales Manager</option>
+                                <option>Operations Manager</option>
+                                <option>Business Development Manager</option>
+                                <option>Financial Analyst</option>
+                                <option>Accountant</option>
+                                <option>Auditor</option>
+                                <option>Finance Manager</option>
+                                <option>Investment Analyst</option>
+                                <option>Bank Manager</option>
+                                <option>Customer Support Executive</option>
+                                <option>Customer Success Manager</option>
+                                <option>Office Administrator</option>
+                                <option>Business Owner</option>
+                                <option>Entrepreneur</option>
+                            </optgroup>
+
+                            <optgroup label="Healthcare">
+                                <option>Doctor</option>
+                                <option>Medical Officer</option>
+                                <option>Nurse</option>
+                                <option>Pharmacist</option>
+                                <option>Dentist</option>
+                                <option>Physiotherapist</option>
+                                <option>Psychologist</option>
+                                <option>Medical Lab Technician</option>
+                                <option>Radiology Technician</option>
+                                <option>Healthcare Administrator</option>
+                                <option>Nutritionist</option>
+                            </optgroup>
+
+                            <optgroup label="Other Professional Jobs">
+                                <option>Lawyer</option>
+                                <option>Civil Services Officer</option>
+                                <option>Government Officer</option>
+                                <option>Police Officer</option>
+                                <option>Architect</option>
+                                <option>Interior Designer</option>
+                                <option>Journalist</option>
+                                <option>Photographer</option>
+                                <option>Video Editor</option>
+                                <option>Animator</option>
+                                <option>Chef</option>
+                                <option>Hotel Manager</option>
+                                <option>Event Manager</option>
+                                <option>Logistics Manager</option>
+                                <option>Supply Chain Analyst</option>
+                                <option>Research Scientist</option>
+                                <option>Environmental Scientist</option>
+                                <option>Agricultural Officer</option>
+                                <option>Social Worker</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience">Experience</label>
+                        <select id="experience" name="experience" required>
+                            <option value="">Select Experience</option>
+                            <option value="0">Fresher</option>
+                            <option value="1">1 year</option>
+                            <option value="2">2 years</option>
+                            <option value="3">3 years</option>
+                            <option value="4">4 years</option>
+                            <option value="5">5 years</option>
+                            <option value="7">6–8 years</option>
+                            <option value="10">9–12 years</option>
+                            <option value="15">13+ years</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="education">Education</label>
+                        <select id="education" name="education" required>
+                            <option value="">Select Education</option>
+                            <option value="High School">High School</option>
+                            <option value="Diploma">Diploma</option>
+                            <option value="Bachelor's Degree">Bachelor's Degree</option>
+                            <option value="Master's Degree">Master's Degree</option>
+                            <option value="PhD">PhD / Doctorate</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="industry">Industry</label>
+                        <select id="industry" name="industry" required>
+                            <option value="">Select Industry</option>
+                            <option value="IT">IT & Technology</option>
+                            <option value="Education">Education</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Finance">Finance & Banking</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Retail">Retail</option>
+                            <option value="Government">Government</option>
+                            <option value="Construction">Construction</option>
+                            <option value="Consulting">Consulting</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="region">Region</label>
+                        <select id="region" name="region" required>
+                            <option value="">Select Region</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Kochi">Kochi</option>
+                            <option value="Bengaluru">Bengaluru</option>
+                            <option value="Chennai">Chennai</option>
+                            <option value="Hyderabad">Hyderabad</option>
+                            <option value="Pune">Pune</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="India">Other Indian City</option>
+                            <option value="International">International</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="company">Company Size</label>
+                        <select id="company" name="company" required>
+                            <option value="">Select Company Size</option>
+                            <option value="Startup">Startup</option>
+                            <option value="Small">Small Company</option>
+                            <option value="Medium">Medium Company</option>
+                            <option value="Large">Large Company</option>
+                            <option value="MNC">Multinational Company (MNC)</option>
+                            <option value="Government">Government Institution</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="predict-button">
+                    Predict My Salary
+                </button>
+
+            </form>
+        </section>
+
+        <section class="card result-card" id="result-card">
+            <div class="result-icon">📊</div>
+            <h2>Salary Estimate</h2>
+
+            <div id="result" aria-live="polite">
+                <p class="muted">
+                    Select your job role and enter your details.
+                    Your estimated salary will appear here.
+                </p>
+            </div>
+
+            <!-- Salary graph -->
+            <div class="result-line">
+                <h3 class="graph-title">Salary Comparison Graph</h3>
+                <p class="muted">
+                    Compare the minimum, predicted and maximum annual salary.
+                </p>
+                <div class="graph-container">
+                    <canvas id="salaryChart"></canvas>
+                </div>
+            </div>
+
+            <p class="notice">
+                Note: These figures are illustrative estimates, not guaranteed
+                salaries. Actual salaries depend on qualifications, employer,
+                location and current market conditions.
+            </p>
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    SalaryPredict &copy; 2026 | Salary estimation tool
+</footer>
+
+<script>
+const roleBase = {
+    "Software Developer": 600000,
+    "Software Engineer": 650000,
+    "Senior Software Engineer": 1400000,
+    "Full Stack Developer": 700000,
+    "Frontend Developer": 550000,
+    "Backend Developer": 650000,
+    "Web Developer": 450000,
+    "Mobile App Developer": 650000,
+    "Android Developer": 600000,
+    "iOS Developer": 700000,
+    "Python Developer": 600000,
+    "Java Developer": 600000,
+    "JavaScript Developer": 550000,
+    "C++ Developer": 650000,
+    "PHP Developer": 450000,
+    "Game Developer": 550000,
+    "DevOps Engineer": 900000,
+    "Cloud Engineer": 850000,
+    "Cloud Architect": 1800000,
+    "Cybersecurity Analyst": 650000,
+    "Cybersecurity Engineer": 900000,
+    "Network Engineer": 500000,
+    "System Administrator": 450000,
+    "IT Support Specialist": 350000,
+    "IT Manager": 1200000,
+    "QA Engineer": 500000,
+    "Software Tester": 400000,
+    "Automation Tester": 650000,
+    "Database Administrator": 700000,
+    "System Architect": 1600000,
+    "Technical Support Engineer": 400000,
+
+    "Data Analyst": 430000,
+    "Data Scientist": 760000,
+    "Data Engineer": 800000,
+    "Big Data Engineer": 1000000,
+    "Machine Learning Engineer": 1100000,
+    "AI Engineer": 1000000,
+    "AI Researcher": 900000,
+    "Business Intelligence Analyst": 650000,
+    "Business Analyst": 520000,
+    "Data Architect": 1500000,
+    "Statistician": 450000,
+    "Research Analyst": 450000,
+    "Data Quality Analyst": 450000,
+    "Database Developer": 600000,
+
+    "UI/UX Designer": 440000,
+    "UI Designer": 400000,
+    "UX Designer": 500000,
+    "Graphic Designer": 350000,
+    "Product Designer": 650000,
+    "Product Manager": 1400000,
+    "Project Manager": 720000,
+    "Scrum Master": 1000000,
+    "Business Consultant": 800000,
+    "Technical Writer": 450000,
+    "Content Writer": 300000,
+
+    "Civil Engineer": 400000,
+    "Mechanical Engineer": 450000,
+    "Electrical Engineer": 450000,
+    "Electronics Engineer": 450000,
+    "Computer Engineer": 550000,
+    "Chemical Engineer": 500000,
+    "Automobile Engineer": 450000,
+    "Biomedical Engineer": 450000,
+    "Aerospace Engineer": 700000,
+    "Robotics Engineer": 750000,
+    "Embedded Systems Engineer": 650000,
+    "Production Engineer": 400000,
+    "Quality Engineer": 450000,
+    "Environmental Engineer": 400000,
+
+    "Nursery Teacher": 180000,
+    "Kindergarten Teacher": 200000,
+    "Pre-Primary Teacher": 200000,
+    "Primary School Teacher": 250000,
+    "Upper Primary Teacher": 280000,
+    "Assistant Teacher": 250000,
+    "School Teacher": 300000,
+    "High School Teacher": 350000,
+    "Higher Secondary Teacher": 420000,
+    "TGT Teacher": 350000,
+    "PGT Teacher": 450000,
+    "Mathematics Teacher": 350000,
+    "Science Teacher": 350000,
+    "Physics Teacher": 380000,
+    "Chemistry Teacher": 380000,
+    "Biology Teacher": 350000,
+    "Computer Science Teacher": 380000,
+    "English Teacher": 320000,
+    "Malayalam Teacher": 300000,
+    "Hindi Teacher": 300000,
+    "Social Science Teacher": 320000,
+    "Economics Teacher": 350000,
+    "Commerce Teacher": 350000,
+    "Physical Education Teacher": 300000,
+    "Art Teacher": 280000,
+    "Music Teacher": 280000,
+    "Special Education Teacher": 320000,
+    "Vocational Teacher": 320000,
+    "Head Teacher": 450000,
+    "School Coordinator": 400000,
+    "Vice Principal": 550000,
+    "School Principal": 700000,
+
+    "Teaching Assistant": 300000,
+    "Academic Instructor": 350000,
+    "College Lecturer": 400000,
+    "Lecturer": 400000,
+    "Guest Lecturer": 240000,
+    "Guest Faculty": 260000,
+    "Visiting Faculty": 300000,
+    "Assistant Professor": 650000,
+    "Associate Professor": 1000000,
+    "Professor": 1400000,
+    "Senior Professor": 1800000,
+    "University Lecturer": 450000,
+    "University Assistant Professor": 700000,
+    "University Associate Professor": 1100000,
+    "University Professor": 1500000,
+    "Adjunct Professor": 450000,
+    "Research Professor": 1000000,
+    "Teaching Fellow": 350000,
+    "Research Fellow": 450000,
+    "Postdoctoral Researcher": 600000,
+    "Head of Department": 900000,
+    "Academic Coordinator": 400000,
+    "College Principal": 1000000,
+    "Dean": 1600000,
+    "University Registrar": 900000,
+    "Laboratory Instructor": 300000,
+
+    "Private Tutor": 240000,
+    "Home Tutor": 240000,
+    "Online Teacher": 300000,
+    "Coaching Centre Teacher": 300000,
+    "IELTS Trainer": 400000,
+    "Language Trainer": 320000,
+    "Corporate Trainer": 550000,
+    "Technical Trainer": 450000,
+    "Computer Instructor": 300000,
+    "Soft Skills Trainer": 400000,
+    "Educational Consultant": 500000,
+    "Curriculum Developer": 500000,
+    "Instructional Designer": 550000,
+    "Education Counsellor": 300000,
+
+    "HR Manager": 500000,
+    "HR Executive": 300000,
+    "Recruiter": 350000,
+    "Marketing Specialist": 420000,
+    "Marketing Manager": 800000,
+    "Digital Marketing Specialist": 400000,
+    "SEO Specialist": 350000,
+    "Sales Executive": 300000,
+    "Sales Manager": 700000,
+    "Operations Manager": 800000,
+    "Business Development Manager": 750000,
+    "Financial Analyst": 600000,
+    "Accountant": 390000,
+    "Auditor": 450000,
+    "Finance Manager": 1000000,
+    "Investment Analyst": 800000,
+    "Bank Manager": 800000,
+    "Customer Support Executive": 250000,
+    "Customer Success Manager": 650000,
+    "Office Administrator": 300000,
+    "Business Owner": 600000,
+    "Entrepreneur": 600000,
+
+    "Doctor": 900000,
+    "Medical Officer": 700000,
+    "Nurse": 300000,
+    "Pharmacist": 300000,
+    "Dentist": 600000,
+    "Physiotherapist": 350000,
+    "Psychologist": 400000,
+    "Medical Lab Technician": 250000,
+    "Radiology Technician": 300000,
+    "Healthcare Administrator": 600000,
+    "Nutritionist": 300000,
+
+    "Lawyer": 500000,
+    "Civil Services Officer": 1000000,
+    "Government Officer": 500000,
+    "Police Officer": 400000,
+    "Architect": 500000,
+    "Interior Designer": 400000,
+    "Journalist": 350000,
+    "Photographer": 300000,
+    "Video Editor": 350000,
+    "Animator": 400000,
+    "Chef": 350000,
+    "Hotel Manager": 600000,
+    "Event Manager": 450000,
+    "Logistics Manager": 650000,
+    "Supply Chain Analyst": 550000,
+    "Research Scientist": 650000,
+    "Environmental Scientist": 400000,
+    "Agricultural Officer": 400000,
+    "Social Worker": 280000
+};
+
+const form = document.getElementById("salary-form");
+const chartCanvas = document.getElementById("salaryChart");
+let salaryChartInstance = null;
+
+// Format salary in Indian Rupees
+function formatINR(amount) {
+    return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0
+    }).format(amount);
+}
+
+// Create or update the salary graph
+function updateSalaryChart(minimum, salary, maximum) {
+    if (typeof Chart === "undefined") {
+        document.querySelector(".graph-container").innerHTML =
+            '<p class="muted">Graph unavailable. Please check your internet connection and reload the page.</p>';
+        return;
+    }
+
+    if (salaryChartInstance) {
+        salaryChartInstance.destroy();
+    }
+
+    salaryChartInstance = new Chart(chartCanvas, {
+        type: "bar",
+
+        data: {
+            labels: [
+                "Minimum Salary",
+                "Predicted Salary",
+                "Maximum Salary"
+            ],
+
+            datasets: [{
+                label: "Annual Salary (₹)",
+                data: [minimum, Math.round(salary), maximum],
+
+                backgroundColor: [
+                    "#38bdf8",
+                    "#3b82f6",
+                    "#818cf8"
+                ],
+
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#f1f5f9"
+                    }
+                },
+
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return " " + formatINR(context.raw);
+                        }
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    ticks: {
+                        color: "#cbd5e1"
+                    },
+
+                    grid: {
+                        display: false
+                    }
+                },
+
+                y: {
+                    beginAtZero: true,
+
+                    ticks: {
+                        color: "#cbd5e1",
+
+                        callback: function(value) {
+                            return "₹" +
+                                new Intl.NumberFormat("en-IN", {
+                                    notation: "compact",
+                                    maximumFractionDigits: 1
+                                }).format(value);
+                        }
+                    },
+
+                    grid: {
+                        color: "#263750"
+                    }
+                }
+            }
+        }
+    });
+}
+
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const role = document.getElementById("role").value;
+    const experience = Number(document.getElementById("experience").value);
+    const education = document.getElementById("education").value;
+    const industry = document.getElementById("industry").value;
+    const region = document.getElementById("region").value;
+    const company = document.getElementById("company").value;
+
+    if (!role || roleBase[role] === undefined) {
+        alert("Please select a job role.");
+        return;
+    }
+
+    let salary = roleBase[role];
+
+    // Experience adjustment
+    if (experience <= 1) {
+        salary *= 0.85;
+    } else if (experience <= 3) {
+        salary *= 1.00;
+    } else if (experience <= 5) {
+        salary *= 1.20;
+    } else if (experience <= 10) {
+        salary *= 1.50;
+    } else {
+        salary *= 1.85;
+    }
+
+    // Education adjustment
+    const educationFactor = {
+        "High School": 0.85,
+        "Diploma": 0.90,
+        "Bachelor's Degree": 1.00,
+        "Master's Degree": 1.20,
+        "PhD": 1.40
+    };
+
+    salary *= educationFactor[education] || 1;
+
+    // Industry adjustment
+    const industryFactor = {
+        "IT": 1.15,
+        "Education": 1.00,
+        "Healthcare": 1.05,
+        "Finance": 1.15,
+        "Manufacturing": 1.00,
+        "Retail": 0.90,
+        "Government": 1.00,
+        "Construction": 1.00,
+        "Consulting": 1.10,
+        "Other": 1.00
+    };
+
+    salary *= industryFactor[industry] || 1;
+
+    // Location adjustment
+    const regionFactor = {
+        "Bengaluru": 1.25,
+        "Mumbai": 1.25,
+        "Delhi": 1.20,
+        "Hyderabad": 1.15,
+        "Chennai": 1.10,
+        "Pune": 1.10,
+        "Kochi": 1.00,
+        "Kerala": 0.95,
+        "India": 1.00,
+        "International": 1.80
+    };
+
+    salary *= regionFactor[region] || 1;
+
+    // Company size adjustment
+    const companyFactor = {
+        "Startup": 0.90,
+        "Small": 0.90,
+        "Medium": 1.00,
+        "Large": 1.15,
+        "MNC": 1.25,
+        "Government": 1.00
+    };
+
+    salary *= companyFactor[company] || 1;
+
+    const minimum = Math.round(salary * 0.90);
+    const maximum = Math.round(salary * 1.10);
+    const monthly = Math.round(salary / 12);
+
+    // Display salary results
+    document.getElementById("result").innerHTML = `
+        <div class="result-line">
+            <div class="muted">Selected Job Role</div>
+            <strong>${role}</strong>
+        </div>
+
+        <div class="result-line">
+            <div class="muted">Estimated Annual Salary Range</div>
+            <div class="salary-amount">
+                ${formatINR(minimum)} – ${formatINR(maximum)}
+            </div>
+        </div>
+
+        <div class="result-line">
+            <div class="muted">Estimated Predicted Annual Salary</div>
+            <div class="salary-amount">${formatINR(Math.round(salary))}</div>
+        </div>
+
+        <div class="result-line">
+            <div class="muted">Estimated Monthly Salary</div>
+            <div class="salary-amount">${formatINR(monthly)}</div>
+        </div>
+
+        <div class="result-line">
+            <div class="muted">Experience</div>
+            <strong>${experience} year(s)</strong>
+        </div>
+
+        <div class="result-line">
+            <div class="muted">Education</div>
+            <strong>${education}</strong>
+        </div>
+
+        <p class="muted">
+            This estimate is calculated using illustrative salary values
+            and profile adjustments. It is not a verified market salary
+            or a machine-learning prediction.
+        </p>
+    `;
+
+    // Update graph after predicting salary
+    updateSalaryChart(minimum, salary, maximum);
+
+    document.getElementById("result-card").scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+    });
+});
+</script>
+
+</body>
+</html>
